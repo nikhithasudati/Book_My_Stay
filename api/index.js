@@ -11,7 +11,7 @@ app.use(express.json());
 
 
 const bcryptSalt = bcrypt.genSaltSync(8);
-const jwtSecret ="dfadfjldkfja";
+const jwtSecret ="dfadfjldkfjakjhjkhjk";
 app.use(cors({
     credentials :true,
     origin : 'http://127.0.0.1:5173',
@@ -49,7 +49,7 @@ app.post('/login',async(req,res) => {
         if (passOk){
             jwt.sign({email:userDoc.email,id:userDoc._id},jwtSecret,{},(err,token) =>{
                 if (err) throw err;
-                res.cookie('token','').json('pass ok');
+                res.cookie('token',token).json('pass ok');
 
 
             });
