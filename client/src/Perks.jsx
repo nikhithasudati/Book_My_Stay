@@ -2,7 +2,7 @@ export default function Perks({selected,onChange}) {
     function handleCbClick(ev){
         const {checked,name} = ev.target;
         if(checked){
-            onChange([...selected,[name]]);
+            onChange([...selected,name]);
         }
         else{
             onChange([...selected.filter(selectedName => selectedName != name)])
