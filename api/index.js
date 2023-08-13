@@ -124,13 +124,77 @@ app.post('/places',(req,res)=>{
         if (err) throw err;
         const placeDoc = await Place.create({
             owner:userData.id,
-            address,title,description,perks,extraInfo,checkIn,checkOut,maxGuests,
+            address,title,photos:addedPhotos,description,perks,extraInfo,checkIn,checkOut,maxGuests,
             });
         
     res.json(placeDoc);
   
     });
-})
+});
+
+// app.get('/places',(req,res) => {
+//     const token = req.cookies;
+//     jwt.verify(token,jwtSecret,{},async(err,userData) => {
+//         const {id} = userData;
+//         res.json(await Place.find({owner:id}));
+   
+//        });
+       
+//     });
+
+
+app.get('/places', async (req, res) => {
+    const { token } = req.cookies;
+    
+    // Verify the token and get user data
+    jwt.verify(token, jwtSecret, {}, async (err, userData) => {
+        if (err) {
+            res.status(401).json({ error: 'Invalid token' });
+            return;
+        }
+        
+        // Now, you can safely destructure the id property from userData
+        const { id } = userData;
+
+        // Use the id to find places owned by the user
+        try {
+            const userPlaces = await Place.find({ owner: id });
+            res.json(userPlaces);
+        } catch (error) {
+            res.status(500).json({ error: 'Internal server error' });
+        }
+    });
+});
+
+
+
+app.get('/places/:id', async (req, res) => {
+    const { id } = req.params;
+    res.json(await Place.findById(id));
+});
+
+app.put('/places', async (req,res) => {
+    // mongoose.connect(process.env.MONGO_URL);
+    const {token} = req.cookies;
+    const {
+      id, title,address,addedPhotos,description,
+      perks,extraInfo,checkIn,checkOut,maxGuests,
+    } = req.body;
+    jwt.verify(token, jwtSecret, {}, async (err, userData) => {
+      if (err) throw err;
+      const placeDoc = await Place.findById(id);
+      if (userData.id === placeDoc.owner.toString()) {
+        placeDoc.set({
+          title,address,photos:addedPhotos,description,
+          perks,extraInfo,checkIn,checkOut,maxGuests,
+        });
+        await placeDoc.save();
+        res.json('ok');
+      }
+    });
+  });
+
+
 
 
 app.listen(3000);
