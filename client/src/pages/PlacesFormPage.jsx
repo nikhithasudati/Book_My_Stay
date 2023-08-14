@@ -17,7 +17,8 @@ export default function PlacesFormPage(){
     const [checkOut,setCheckOut] = useState('');
     const [maxGuests,setMaxGuests] = useState();
     const [redirect,setRedirect] = useState(false);
-    useEffect(() =>{
+    const [price,setPrice] = useState(100);
+     useEffect(() =>{
         if(!id){
             return;
         }
@@ -32,7 +33,9 @@ export default function PlacesFormPage(){
             setCheckIn(data.checkIn);
             setCheckOut(data.checkOut);
             setMaxGuests(data.maxGuests);
-        })
+            setPrice(data.price);
+
+        });
     },[id]);
     function inputHeader(text) {
         return (
@@ -57,7 +60,7 @@ export default function PlacesFormPage(){
         const placeData = {
           title, address, addedPhotos,
           description, perks, extraInfo,
-          checkIn, checkOut, maxGuests,
+          checkIn, checkOut, maxGuests,price,
         };
         if (id) {
           // update
@@ -98,7 +101,7 @@ export default function PlacesFormPage(){
                         {preInput('Extra Info','house rules,etc')}
                         <textarea value={extraInfo} onChange = {ev => setExtraInfo(ev.target.value)} />
                         {preInput('Check in&out times', 'add checkin and check out times.')}
-                        <div className='grid gap-2 sm:grid-cols-3'>
+                        <div className='grid gap-2 grid-cols-2 md:grid-cols-4' >
                             <div>
                                 <h3 className='mt-2 mb-1'> Check in Time</h3>
                                 <input type="number" value ={checkIn} onChange={ev => setCheckIn(ev.target.value)} 
@@ -114,10 +117,17 @@ export default function PlacesFormPage(){
                                 <input type="number" value ={maxGuests} onChange={ev => setMaxGuests(ev.target.value)}
                                 placeholder='4' />
                             </div>
+                            <div>
+                                <h3 className='mt-2 mb-1'> Price per night</h3>
+                                <input type="number" value ={price} onChange={ev => setPrice(ev.target.value)}
+                                placeholder='4' />
+                            </div>
+
+
 
                         </div>
                         <div  >
-                            <button className=' flex text-center primary'> save</button>
+                            <button className='primary my-4'> Save</button>
                         </div>
 
                     </form>
