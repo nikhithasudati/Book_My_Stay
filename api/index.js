@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const User = require('./models/User.js');
 const jwt = require('jsonwebtoken');
 const Place = require('./models/Place.js');
+const Booking = require('./models/Booking.js');
 const bcrypt = require('bcryptjs');
 const cookieParser = require('cookie-parser');
 const imageDownloader = require('image-downloader');
@@ -19,6 +20,16 @@ app.use(cookieParser());
 
 const bcryptSalt = bcrypt.genSaltSync(8);
 const jwtSecret ="dfadfjldkfjakjhjkhjk";
+
+function getUserDataFromReq(req) {
+    return new Promise((resolve, reject) => {
+      jwt.verify(req.cookies.token, jwtSecret, {}, async (err, userData) => {
+        if (err) throw err;
+        resolve(userData);
+      });
+    });
+  } 
+
 app.use(cors({
     credentials :true,
     origin : 'http://127.0.0.1:5173',
@@ -188,6 +199,29 @@ app.put('/places', async (req,res) => {
 
 app.get('/places',async (req,res) =>{
     res.json ( await Place.find());
-})
+});
 
+app.post('/bookings',async(req,res) =>{
+    const userData = await getUserDataFromReq(req);
+    const {place,checkIn,checkOut,
+        numberOfGuests,name,phone,price} = req.body;
+        Booking.create({
+            place,checkIn,checkOut,numberOfGuests,name,phone,price,
+    user:userData.id,
+
+        }).then((doc) => {
+            res.json(doc);
+        }).catch((err) => {
+            throw err;
+        });
+});
+
+
+app.get('/api/bookings', async (req,res) => {
+    // mongoose.connect(process.env.MONGO_URL);
+    const userData = await getUserDataFromReq(req);
+    res.json( await Booking.find({user:userData.id}).populate('place') );
+  });
+
+  
 app.listen(3000);
